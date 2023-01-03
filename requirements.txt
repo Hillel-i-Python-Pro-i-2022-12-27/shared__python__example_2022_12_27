@@ -1,0 +1,4 @@
+# For name generation.
+faker==15.3.4
+
+
