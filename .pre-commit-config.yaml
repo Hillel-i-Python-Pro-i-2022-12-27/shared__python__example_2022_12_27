@@ -1,0 +1,37 @@
+repos:
+  - repo: local
+    hooks:
+      - id: pyupgrade
+        name: pyupgrade
+        entry: pyupgrade
+        args: [
+          "--py311-plus"
+        ]
+        language: system
+        types:
+          - python
+
+      - id: autoflake
+        name: autoflake
+        entry: autoflake
+        language: system
+        exclude: |
+          (?x)^(
+              .*/__init__.py
+          )$
+        types:
+          - python
+
+      - id: black
+        name: black
+        entry: black
+        language: system
+        types:
+          - python
+
+      - id: flake8
+        name: flake8
+        entry: flake8
+        language: system
+        types:
+          - python
