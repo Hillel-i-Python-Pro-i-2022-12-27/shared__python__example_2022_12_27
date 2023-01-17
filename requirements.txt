@@ -1,5 +1,5 @@
 # For name generation.
-faker==16.3.0
+faker==16.5.0
 
 # [code_style]-[BEGIN]
 # Pre-commit hook.
@@ -13,3 +13,6 @@ flake8==6.0.0
 # Removes unused imports and unused variables.
 autoflake==2.0.0
 # [code_style]-[END]
+
+# For making requests.
+requests==2.28.2
