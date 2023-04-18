@@ -16,3 +16,9 @@ autoflake==2.0.0
 
 # For making requests.
 requests==2.28.2
+
+aiohttp[speedups]==3.8.4
+
+beautifulsoup4==4.12.2
+# Selenium.
+# Pupeeter.
