@@ -1,12 +1,12 @@
 import concurrent.futures
+import multiprocessing
 import os
 import queue
-import time
 import random
+import time
 from typing import NamedTuple
 
 from application.logging.loggers import get_core_logger
-import multiprocessing
 
 
 class Result(NamedTuple):
@@ -26,7 +26,11 @@ def do_something(number: int) -> Result:
     return Result(number=number, result=number**2)
 
 
-def do_something_by_queue(input_queue: multiprocessing.Queue, output_queue: multiprocessing.Queue) -> None:
+def do_something_by_queue(
+    input_queue: multiprocessing.Queue,
+    output_queue: multiprocessing.Queue,
+    pseudo_cache: multiprocessing.Manager().dict,
+) -> None:
     logger = get_core_logger()
     logger.info("Start calculations by queue")
     while input_queue.qsize():
@@ -36,7 +40,14 @@ def do_something_by_queue(input_queue: multiprocessing.Queue, output_queue: mult
         except queue.Empty:
             logger.info("Queue is empty")
             return
-        result = do_something(number)
+
+        try:
+            result = pseudo_cache[number]
+            logger.info(f"Result was found in cache. {result=}")
+        except KeyError:
+            result = do_something(number)
+            pseudo_cache[number] = result
+
         output_queue.put(result)
         logger.info(
             f"Put result to output queue. Queue: {input_queue.qsize()=}, {output_queue.qsize()=}, {os.getpid()}"
@@ -45,6 +56,7 @@ def do_something_by_queue(input_queue: multiprocessing.Queue, output_queue: mult
 
 # Primitives for concurrency:
 # Queue.
+# Pipe.
 # Lock.
 # Semaphore.
 # Event.
@@ -59,6 +71,9 @@ def concurrency_example():
 
     with concurrent.futures.ProcessPoolExecutor() as executor:
         results = executor.map(do_something, numbers)
+
+    # with concurrent.futures.ThreadPoolExecutor() as executor:
+    #     results = executor.map(do_something, numbers)
 
     # results = low_level_multiprocessing()
 
@@ -77,9 +92,15 @@ def low_level_multiprocessing():
         input_queue.put(number)
 
     amount_of_workers = os.cpu_count()
+
+    # psutil
+
+    pseudo_cache = multiprocessing.Manager().dict()
+
     processes = []
     for _ in range(amount_of_workers):
-        process = multiprocessing.Process(target=do_something_by_queue, args=(input_queue, output_queue))
+        process = multiprocessing.Process(target=do_something_by_queue, args=(input_queue, output_queue, pseudo_cache))
+        # thread = threading.Thread(target=do_something_by_queue, args=(input_queue, output_queue, pseudo_cache))
         processes.append(process)
         process.start()
 
