@@ -1,5 +1,6 @@
 # from application.concurrency_example.async_crawler import async_crawler_main
 # from application.argparse_example.argparse_example import argparse_example_main
+from application.get_some_content_from_page.get_some_content_from_page import get_some_content_from_page_main
 
 # from application.requests_example.requests_example import requests_example
 
@@ -26,6 +27,8 @@ def main() -> None:
 
     # psutil_example_main()
     # argparse_example_main()
+
+    get_some_content_from_page_main()
 
     ...
 
